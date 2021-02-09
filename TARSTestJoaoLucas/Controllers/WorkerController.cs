@@ -11,7 +11,7 @@ namespace TARSTestJoaoLucas.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    class WorkerController : ControllerBase
+    public class WorkerController : ControllerBase
     {
         private readonly ILogger<WorkerController> _logger;
         private readonly AppDbContext _context;

@@ -3,7 +3,7 @@ using TARSTestJoaoLucas.Models;
 
 namespace TARSTestJoaoLucas.Context
 {
-    class AppDbContext : DbContext
+    public class AppDbContext : DbContext
     {
         public DbSet<Worker> Workers { get; set; }
         public DbSet<Project> Projects { get; set; }

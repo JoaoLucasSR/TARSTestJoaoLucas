@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TARSTestJoaoLucas.Models
 {
-    class Project
+    public class Project
     {
         [Key]
         public int Id { get; set; }
