@@ -27,9 +27,11 @@ namespace TARSTestJoaoLucas.Migrations
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasMaxLength(40)
                         .HasColumnType("character varying(40)");
 
@@ -54,6 +56,7 @@ namespace TARSTestJoaoLucas.Migrations
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasMaxLength(60)
                         .HasColumnType("character varying(60)");
 

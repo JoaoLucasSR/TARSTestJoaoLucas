@@ -10,7 +10,7 @@ using TARSTestJoaoLucas.Context;
 namespace TARSTestJoaoLucas.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20210209211314_Initial")]
+    [Migration("20210210130525_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -29,9 +29,11 @@ namespace TARSTestJoaoLucas.Migrations
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasMaxLength(40)
                         .HasColumnType("character varying(40)");
 
@@ -56,6 +58,7 @@ namespace TARSTestJoaoLucas.Migrations
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasMaxLength(60)
                         .HasColumnType("character varying(60)");
 
