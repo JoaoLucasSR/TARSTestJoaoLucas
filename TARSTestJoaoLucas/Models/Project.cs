@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -17,6 +18,7 @@ namespace TARSTestJoaoLucas.Models
 
         [ForeignKey("Worker")]
         public int WorkerId { get; set; }
+        [JsonIgnore]
         public virtual Worker Worker { get; set; }
     }
 }
