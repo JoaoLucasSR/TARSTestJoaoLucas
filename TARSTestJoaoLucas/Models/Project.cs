@@ -7,8 +7,10 @@ namespace TARSTestJoaoLucas.Models
     {
         [Key]
         public int Id { get; set; }
+        [Required]
         [MaxLength(40)]
         public string Name { get; set; }
+        [Required]
         [DataType(DataType.MultilineText)]
         public string Description { get; set; }
         public double WorkedHours { get; set; }
