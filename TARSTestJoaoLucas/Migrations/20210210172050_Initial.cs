@@ -13,18 +13,11 @@ namespace TARSTestJoaoLucas.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "character varying(60)", maxLength: 60, nullable: false),
-                    WorkerId = table.Column<int>(type: "integer", nullable: true)
+                    Name = table.Column<string>(type: "character varying(60)", maxLength: 60, nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Workers", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Workers_Workers_WorkerId",
-                        column: x => x.WorkerId,
-                        principalTable: "Workers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -52,11 +45,6 @@ namespace TARSTestJoaoLucas.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Projects_WorkerId",
                 table: "Projects",
-                column: "WorkerId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Workers_WorkerId",
-                table: "Workers",
                 column: "WorkerId");
         }
 
