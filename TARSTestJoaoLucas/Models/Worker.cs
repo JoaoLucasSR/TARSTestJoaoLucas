@@ -10,6 +10,6 @@ namespace TARSTestJoaoLucas.Models
         [Required]
         [MaxLength(60)]
         public string Name { get; set; }
-        public virtual ICollection<Worker> Workers { get; set; }
+        public virtual ICollection<Project> Projects { get; set; }
     }
 }
