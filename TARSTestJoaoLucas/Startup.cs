@@ -27,7 +27,7 @@ namespace TARSTestJoaoLucas
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddEntityFrameworkNpgsql().AddDbContext<AppDbContext>(option => {
+            services.AddDbContext<AppDbContext>(option => {
                 option.UseNpgsql(Configuration.GetConnectionString("DBConnection"));
             });
             services.AddControllers();
