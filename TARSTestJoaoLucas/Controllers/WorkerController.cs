@@ -39,6 +39,17 @@ namespace TARSTestJoaoLucas.Controllers
             return worker;
         }
 
+        [HttpGet("{id}/project")]
+        public async Task<ActionResult<ICollection<Project>>> GetProject(int id)
+        {
+            var worker = await _context.Workers.Where(w => w.Id == id).Include(w => w.Projects).FirstOrDefaultAsync();
+
+            if(worker == null)
+                return NotFound();
+            
+            return Ok(worker.Projects);
+        }
+
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] Worker worker)
         {
