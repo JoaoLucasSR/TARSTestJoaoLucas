@@ -1,8 +1,10 @@
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using TARSTestJoaoLucas.Models;
 using TARSTestJoaoLucas.Context;
+using TARSTestJoaoLucas.Pagination;
 
 namespace TARSTestJoaoLucas.Repository
 {
@@ -10,6 +12,14 @@ namespace TARSTestJoaoLucas.Repository
     {
         public ProjectRepository(AppDbContext context) : base(context)
         { }
+
+        public async Task<IEnumerable<Project>> GetProjectsPagination(PaginationParameters paginationParameters)
+        {
+            return await Get().OrderBy(p => p.Id)
+            .Skip((paginationParameters.PageNumber - 1) * paginationParameters.PageSize)
+            .Take(paginationParameters.PageSize)
+            .ToListAsync();
+        }
 
         public async Task<Worker> GetProjectWorker(int id)
         {
