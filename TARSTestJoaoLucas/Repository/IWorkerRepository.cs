@@ -7,7 +7,7 @@ namespace TARSTestJoaoLucas.Repository
 {
     public interface IWorkerRepository : IRepository<Worker>
     {
-        Task<IEnumerable<Project>> GetWorkerProjectsPagiation(int id, PaginationParameters paginationParameters);
+        Task<PagedList<Project>> GetWorkerProjectsPagiation(int id, PaginationParameters paginationParameters);
         Task<IEnumerable<Project>> GetWorkerProjects(int id);
     }
 }

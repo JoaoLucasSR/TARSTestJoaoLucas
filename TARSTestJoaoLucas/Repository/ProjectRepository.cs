@@ -13,12 +13,9 @@ namespace TARSTestJoaoLucas.Repository
         public ProjectRepository(AppDbContext context) : base(context)
         { }
 
-        public async Task<IEnumerable<Project>> GetProjectsPagination(PaginationParameters paginationParameters)
+        public async Task<PagedList<Project>> GetProjectsPagination(PaginationParameters paginationParameters)
         {
-            return await Get().OrderBy(p => p.Id)
-            .Skip((paginationParameters.PageNumber - 1) * paginationParameters.PageSize)
-            .Take(paginationParameters.PageSize)
-            .ToListAsync();
+            return await PagedList<Project>.ToPagedList(Get().OrderBy(p => p.Id), paginationParameters.PageNumber, paginationParameters.PageSize);
         }
 
         public async Task<Worker> GetProjectWorker(int id)
