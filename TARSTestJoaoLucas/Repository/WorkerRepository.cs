@@ -18,6 +18,11 @@ namespace TARSTestJoaoLucas.Repository
             return await PagedList<Project>.ToPagedList((await Get().Where(w => w.Id == id).Include(w => w.Projects.OrderBy(p => p.Id)).SingleOrDefaultAsync()).Projects.AsQueryable(), paginationParameters.PageNumber, paginationParameters.PageSize);
         }
 
+        public async Task<PagedList<Worker>> GetWorkersPagination(PaginationParameters paginationParameters)
+        {
+            return await PagedList<Worker>.ToPagedList(Get().OrderBy(w => w.Id), paginationParameters.PageNumber, paginationParameters.PageSize);
+        }
+
         public async Task<IEnumerable<Project>> GetWorkerProjects(int id)
         {
             return (await Get().Where(w => w.Id == id).Include(w => w.Projects).SingleOrDefaultAsync()).Projects;

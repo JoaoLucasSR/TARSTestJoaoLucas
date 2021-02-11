@@ -1,4 +1,4 @@
-using System.Linq;
+using System.Text.Json;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using TARSTestJoaoLucas.Models;
 using TARSTestJoaoLucas.Repository;
+using TARSTestJoaoLucas.Pagination;
 
 namespace TARSTestJoaoLucas.Controllers
 {
@@ -23,9 +24,23 @@ namespace TARSTestJoaoLucas.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Worker>>> Get()
+        public async Task<ActionResult<IEnumerable<Worker>>> Get([FromQuery] PaginationParameters paginationParameters)
         {
-            return await _uof.WorkerRepository.Get().ToListAsync();
+            var workers = await _uof.WorkerRepository.GetWorkersPagination(paginationParameters);
+
+            var pageMetadata = new
+            {
+                workers.TotalCount,
+                workers.PageSize,
+                workers.CurrentPage,
+                workers.TotalPages,
+                workers.HasNext,
+                workers.HasPrevious
+            };
+
+            Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(pageMetadata));
+
+            return workers;
         }
 
         [HttpGet("{id}")]
@@ -40,14 +55,26 @@ namespace TARSTestJoaoLucas.Controllers
         }
 
         [HttpGet("{id}/project")]
-        public async Task<ActionResult<IEnumerable<Project>>> GetProject(int id)
+        public async Task<ActionResult<IEnumerable<Project>>> GetProject(int id, [FromQuery] PaginationParameters paginationParameters)
         {
-            var projects = await _uof.WorkerRepository.GetWorkerProjects(id);
+            var projects = await _uof.WorkerRepository.GetWorkerProjectsPagiation(id, paginationParameters);
+
+            var pageMetadata = new
+            {
+                projects.TotalCount,
+                projects.PageSize,
+                projects.CurrentPage,
+                projects.TotalPages,
+                projects.HasNext,
+                projects.HasPrevious
+            };
+
+            Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(pageMetadata));
 
             if(projects == null)
                 return NotFound();
             
-            return Ok(projects);
+            return projects;
         }
 
         [HttpPut("{id}")]

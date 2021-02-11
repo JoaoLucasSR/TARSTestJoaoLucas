@@ -1,4 +1,4 @@
-using System.Linq;
+using System.Text.Json;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using TARSTestJoaoLucas.Models;
 using TARSTestJoaoLucas.Repository;
+using TARSTestJoaoLucas.Pagination;
 
 namespace TARSTestJoaoLucas.Controllers
 {
@@ -23,9 +24,23 @@ namespace TARSTestJoaoLucas.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Project>>> Get()
+        public async Task<ActionResult<IEnumerable<Project>>> Get([FromQuery] PaginationParameters paginationParameters)
         {
-            return await _uof.ProjectRepository.Get().ToListAsync();
+            var projects = await _uof.ProjectRepository.GetProjectsPagination(paginationParameters);
+
+            var pageMetadata = new
+            {
+                projects.TotalCount,
+                projects.PageSize,
+                projects.CurrentPage,
+                projects.TotalPages,
+                projects.HasNext,
+                projects.HasPrevious
+            };
+
+            Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(pageMetadata));
+
+            return projects;
         }
 
         [HttpGet("{id}")]
