@@ -13,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
 using TARSTestJoaoLucas.Context;
+using TARSTestJoaoLucas.Repository;
 
 namespace TARSTestJoaoLucas
 {
@@ -27,6 +28,7 @@ namespace TARSTestJoaoLucas
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddDbContext<AppDbContext>(option => {
                 option.UseNpgsql(Configuration.GetConnectionString("DBConnection"));
             });
