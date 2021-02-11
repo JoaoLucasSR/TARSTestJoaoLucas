@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using TARSTestJoaoLucas.Models;
-using TARSTestJoaoLucas.Context;
+using TARSTestJoaoLucas.Repository;
 
 namespace TARSTestJoaoLucas.Controllers
 {
@@ -14,24 +14,24 @@ namespace TARSTestJoaoLucas.Controllers
     public class ProjectController : ControllerBase
     {
         private readonly ILogger<ProjectController> _logger;
-        private readonly AppDbContext _context;
+        private readonly IUnitOfWork _uof;
 
-        public ProjectController(ILogger<ProjectController> logger, AppDbContext context)
+        public ProjectController(ILogger<ProjectController> logger, IUnitOfWork uof)
         {
             _logger = logger;
-            _context = context;
+            _uof = uof;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Project>>> Get()
         {
-            return await _context.Projects.ToListAsync();
+            return await _uof.ProjectRepository.Get().ToListAsync();
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Project>> GetId(int id)
         {
-            var project = await _context.Projects.FindAsync(id);
+            var project = await _uof.ProjectRepository.GetById(p => p.Id == id);
 
             if(project == null)
                 return NotFound();
@@ -42,12 +42,12 @@ namespace TARSTestJoaoLucas.Controllers
         [HttpGet("{id}/worker")]
         public async Task<ActionResult<Worker>> GetWorker(int id)
         {
-            var project = await _context.Projects.Where(p => p.Id == id).Include(p => p.Worker).FirstOrDefaultAsync();
+            var worker = await _uof.ProjectRepository.GetProjectWorker(id);
 
-            if(project == null)
+            if(worker == null)
                 return NotFound();
             
-            return Ok(project.Worker);
+            return worker;
         }
 
         [HttpPut("{id}")]
@@ -56,15 +56,15 @@ namespace TARSTestJoaoLucas.Controllers
             if(id != project.Id)
                 return BadRequest("Id's are not the same");
 
-            _context.Entry(project).State = EntityState.Modified;
+            _uof.ProjectRepository.Update(project);
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _uof.CommitAsync();
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                if(!ProjectExists(id))
+                if(!(await ProjectExists(id)))
                     return NotFound();
                 else
                     _logger.LogError(ex.Message);
@@ -76,8 +76,8 @@ namespace TARSTestJoaoLucas.Controllers
         [HttpPost]
         public async Task<ActionResult<Project>> Post([FromBody] Project project)
         {
-            _context.Projects.Add(project);
-            await _context.SaveChangesAsync();
+            _uof.ProjectRepository.Add(project);
+            await _uof.CommitAsync();
 
             return CreatedAtAction("GetId", new { id = project.Id}, project);
         }
@@ -85,19 +85,19 @@ namespace TARSTestJoaoLucas.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<Project>> Delete(int id)
         {
-            var project = await _context.Projects.FindAsync(id);
+            var project = await _uof.ProjectRepository.GetById(p => p.Id == id);
             if(project == null)
                 return NotFound();
             
-            _context.Projects.Remove(project);
-            await _context.SaveChangesAsync();
+            _uof.ProjectRepository.Delete(project);
+            await _uof.CommitAsync();
 
             return project;
         }
 
-        private bool ProjectExists(int id)
+        private async Task<bool> ProjectExists(int id)
         {
-            return _context.Projects.Any(p => p.Id == id);
+            return (await _uof.ProjectRepository.GetById(p => p.Id == id)) != null;
         }
     }
 }

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using TARSTestJoaoLucas.Models;
-using TARSTestJoaoLucas.Context;
+using TARSTestJoaoLucas.Repository;
 
 namespace TARSTestJoaoLucas.Controllers
 {
@@ -14,24 +14,24 @@ namespace TARSTestJoaoLucas.Controllers
     public class WorkerController : ControllerBase
     {
         private readonly ILogger<WorkerController> _logger;
-        private readonly AppDbContext _context;
+        private readonly IUnitOfWork _uof;
 
-        public WorkerController(ILogger<WorkerController> logger, AppDbContext context)
+        public WorkerController(ILogger<WorkerController> logger, IUnitOfWork uof)
         {
             _logger = logger;
-            _context = context;
+            _uof = uof;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Worker>>> Get()
         {
-            return await _context.Workers.ToListAsync();
+            return await _uof.WorkerRepository.Get().ToListAsync();
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Worker>> GetId(int id)
         {
-            var worker = await _context.Workers.FindAsync(id);
+            var worker = await _uof.WorkerRepository.GetById(w => w.Id == id);
 
             if(worker == null)
                 return NotFound();
@@ -40,14 +40,14 @@ namespace TARSTestJoaoLucas.Controllers
         }
 
         [HttpGet("{id}/project")]
-        public async Task<ActionResult<ICollection<Project>>> GetProject(int id)
+        public async Task<ActionResult<IEnumerable<Project>>> GetProject(int id)
         {
-            var worker = await _context.Workers.Where(w => w.Id == id).Include(w => w.Projects).FirstOrDefaultAsync();
+            var projects = await _uof.WorkerRepository.GetWorkerProjects(id);
 
-            if(worker == null)
+            if(projects == null)
                 return NotFound();
             
-            return Ok(worker.Projects);
+            return Ok(projects);
         }
 
         [HttpPut("{id}")]
@@ -56,15 +56,15 @@ namespace TARSTestJoaoLucas.Controllers
             if(id != worker.Id)
                 return BadRequest("Id's are not the same");
 
-            _context.Entry(worker).State = EntityState.Modified;
+            _uof.WorkerRepository.Update(worker);
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _uof.CommitAsync();
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                if(!WorkerExists(id))
+                if(!(await WorkerExists(id)))
                     return NotFound();
                 else
                     _logger.LogError(ex.Message);
@@ -76,8 +76,8 @@ namespace TARSTestJoaoLucas.Controllers
         [HttpPost]
         public async Task<ActionResult<Worker>> Post([FromBody] Worker worker)
         {
-            _context.Workers.Add(worker);
-            await _context.SaveChangesAsync();
+            _uof.WorkerRepository.Add(worker);
+            await _uof.CommitAsync();
 
             return CreatedAtAction("GetId", new { id = worker.Id}, worker);
         }
@@ -85,19 +85,19 @@ namespace TARSTestJoaoLucas.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<Worker>> Delete(int id)
         {
-            var worker = await _context.Workers.FindAsync(id);
+            var worker = await _uof.WorkerRepository.GetById(w => w.Id == id);
             if(worker == null)
                 return NotFound();
             
-            _context.Workers.Remove(worker);
-            await _context.SaveChangesAsync();
+            _uof.WorkerRepository.Delete(worker);
+            await _uof.CommitAsync();
 
             return worker;
         }
 
-        private bool WorkerExists(int id)
+        private async Task<bool> WorkerExists(int id)
         {
-            return _context.Workers.Any(w => w.Id == id);
+            return (await _uof.WorkerRepository.GetById(w => w.Id == id)) != null;
         }
     }
 }
