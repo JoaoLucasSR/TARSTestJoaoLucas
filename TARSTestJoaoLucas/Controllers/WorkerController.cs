@@ -59,6 +59,9 @@ namespace TARSTestJoaoLucas.Controllers
         {
             var projects = await _uof.WorkerRepository.GetWorkerProjectsPagiation(id, paginationParameters);
 
+            if(projects == null)
+                return NotFound();
+
             var pageMetadata = new
             {
                 projects.TotalCount,
@@ -70,9 +73,6 @@ namespace TARSTestJoaoLucas.Controllers
             };
 
             Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(pageMetadata));
-
-            if(projects == null)
-                return NotFound();
             
             return projects;
         }
