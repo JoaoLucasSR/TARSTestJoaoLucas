@@ -55,7 +55,7 @@ namespace TARSTestJoaoLucas.Controllers
         }
 
         [HttpGet("{id}/project")]
-        public async Task<ActionResult<IEnumerable<Project>>> GetProject(int id, [FromQuery] PaginationParameters paginationParameters)
+        public async Task<ActionResult<List<Project>>> GetProject(int id, [FromQuery] PaginationParameters paginationParameters)
         {
             var projects = await _uof.WorkerRepository.GetWorkerProjectsPagiation(id, paginationParameters);
 
