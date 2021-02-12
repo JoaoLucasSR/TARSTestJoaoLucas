@@ -33,6 +33,7 @@ namespace TARSTestJoaoLucas
                 option.UseNpgsql(Configuration.GetConnectionString("DBConnection"));
             });
             services.AddControllers();
+            services.AddCors();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "TARSTestJoaoLucas", Version = "v1" });
@@ -47,6 +48,8 @@ namespace TARSTestJoaoLucas
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "TARSTestJoaoLucas v1"));
             }
+
+            app.UseCors(options => options.AllowAnyOrigin());
 
             //app.UseHttpsRedirection();
 
