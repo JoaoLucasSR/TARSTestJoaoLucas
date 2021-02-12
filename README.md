@@ -13,9 +13,13 @@
 - Repository with Unit of Work pattern;
 - Pagination;
 - Logger with Serilog;
+- Unit Test with XUnit;
 
 ## Como iniciar a API:
 1. Ajuste a ConnectionStrings para seu ambiente (Ex: localhost)
 2. Rode o script create_database.sql para criar a Database
 3. Realize os comando de migração do Entity Framework, caso utilize o dotnet cli lembre-se de instalar a tool do Entity Framework
 4. São 2 migration, uma Initial que carrega todo o domain e a segunda Populadb que faz a população do banco de dados
+
+## Front-end:
+- Não foi terminado o front infelizmente, foquei muito na api e acabou deixando o front com pouco tempo
